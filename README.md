@@ -24,7 +24,6 @@ optional arguments:
   -k keyword   Custom Not Found keyword
   -c cookie    Custom cookie
   -s spider    Use spider's User-Agent
-
 ```
 
 ## Example
