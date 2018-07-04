@@ -30,6 +30,6 @@ optional arguments:
 
 ```
 ./dork.py -u www.test.com -f dict/DIR.txt
-./dork.py -u www.test.com -m GET -k '404'-f dict/DIR.txt
+./dork.py -u www.test.com -m GET -k '404' -f dict/DIR.txt
 ./dork.py -u www.test.com -m HEAD -c 'isLogin=1' -s baidu -f dict/DIR.txt
 ```
