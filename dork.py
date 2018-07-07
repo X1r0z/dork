@@ -130,9 +130,9 @@ def social(url):
     dic = []
     for e in ext:
         for s in surl:
-            dic.append(s + e)
+            dic.append('/' + s + e)
         for n in sname:
-            dic.append(n + e)
+            dic.append('/' + n + e)
     dic = list(set(dic))
     return dic
 
@@ -204,7 +204,8 @@ def random_ip():
     return headers
 
 def parse_url(url):
-    return url.replace('http://', '').replace('https://', '').replace('/', '')
+    url = url.replace('http://', '').replace('https://', '')
+    return url.split('/')[0]
 
 def join_url(url):
     if url.find('://') == -1:
