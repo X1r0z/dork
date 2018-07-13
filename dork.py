@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from random import choice
 from urllib import parse
 from queue import Queue
 import threading
@@ -10,7 +11,7 @@ import signal
 import time
 import sys
 
-user_agent = 'Dork v1.2#stable (https://github.com/X1r0z/dork)'
+user_agent = 'Dork v1.4#stable (https://github.com/X1r0z/dork)'
 user_ip = '127.0.0.1'
 cookie = 'hello=world'
 referer = 'https://www.baidu.com/'
@@ -22,13 +23,14 @@ sig = threading.Event()
 flag = False
 
 class MultiThread(threading.Thread):
-    def __init__(self, queue, urls, method, keyword, number, headers):
+    def __init__(self, queue, urls, method, keyword, delay, timeout, headers):
         threading.Thread.__init__(self)
         self.queue = queue
         self.urls = urls
         self.method = method
         self.keyword = keyword
-        self.number = number
+        self.delay = delay
+        self.timeout = timeout
         self.headers = headers
 
     def run(self):
@@ -42,23 +44,23 @@ class MultiThread(threading.Thread):
                 url = parse_url(url)
                 self.headers.update(random_ua())
                 self.headers.update(random_ip())
-                startscan(murl, url, self.method, self.keyword, self.headers)
-                delay(self.number)
+                startscan(murl, url, self.method, self.keyword, self.timeout, self.headers)
+                delay(self.delay)
 
-def startscan(murl, url, method, keyword, headers):
+def startscan(murl, url, method, keyword, timeout, headers):
     if method.lower() == 'head':
-        headscan(murl, url, headers)
+        headscan(murl, url, timeout, headers)
     elif method.lower() == 'get':
-        getscan(murl, url, keyword, headers)
+        getscan(murl, url, keyword, timeout, headers)
     elif method.lower() == 'post':
-        postscan(murl, url, keyword, headers)
+        postscan(murl, url, keyword, timeout, headers)
     else:
         print_text('Wrong Method! Please Check it!', 'info')
         sys.exit()
 
-def headscan(murl, url, headers):
+def headscan(murl, url, timeout, headers):
     try:
-        response = requests.head(murl, headers=headers)
+        response = requests.head(murl, headers=headers, timeout=timeout)
         status_code = response.status_code
     except:
         status_code = 'Connect Error'
@@ -70,9 +72,9 @@ def headscan(murl, url, headers):
              print_text(str(status_code) + '\t' + ' -> ' + murl, 'error')
          mutex.release()
 
-def getscan(murl, url, keyword, headers):
+def getscan(murl, url, keyword, timeout, headers):
     try:
-        response = requests.get(murl, headers=headers)
+        response = requests.get(murl, headers=headers, timeout=timeout)
         status_code = response.status_code
         if keyword is not None:
             if response.text.find(keyword) != -1:
@@ -88,9 +90,9 @@ def getscan(murl, url, keyword, headers):
              print_text(str(status_code) + '\t' + ' -> ' + murl, 'error')
          mutex.release()
 
-def postscan(murl, url, keyword, headers):
+def postscan(murl, url, keyword, timeout, headers):
     try:
-        response = requests.post(murl, headers=headers)
+        response = requests.post(murl, headers=headers, timeout=timeout)
         status_code = response.status_code
         if keyword is not None:
             if response.text.find(keyword) != -1:
@@ -171,7 +173,7 @@ def random_ua():
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36 TheWorld 7'
     ]
     if args.ua:
-        ua = random.choice(uas)
+        ua = choice(uas)
     else:
         ua = user_agent
 
@@ -183,10 +185,10 @@ def random_ua():
 def random_ip():
     if args.ip:
         ip = '%s.%s.%s.%s' % (
-        random.choice(range(255)),
-        random.choice(range(255)),
-        random.choice(range(255)),
-        random.choice(range(255))
+        choice(range(255)),
+        choice(range(255)),
+        choice(range(255)),
+        choice(range(255))
     )
     else:
         ip = user_ip
@@ -227,20 +229,10 @@ def print_text(text,level):
 
 def warning_message():
     print_text('Current status code: '+ ' '.join([str(c) for c in code]), 'warning')
-    if args.number != 0:
-        print_text('Delay Time: ' + str(args.number), 'warning')
-    else:
-        print_text('No Delay Time', 'warning')
-    if args.cookie != cookie:
-        print_text('Custom Cookie', 'warning')
-    else:
-        print_text('Cookie: ' + cookie, 'warning')
-    if args.referer != referer:
-        print_text('Custom Referer', 'warning')
-    else:
-        print_text('Referer: ' + referer, 'warning')
-    if args.social:
-        print_text('Using Social Engineering Mode', 'warning')
+    print_text('Time out: ' + str(args.timeout), 'warning')
+    print_text('Delay Time: ' + str(args.delay), 'warning')
+    print_text('Cookie: ' + cookie, 'warning')
+    print_text('Referer: ' + referer, 'warning')
     if args.ua:
         print_text('Using Random User-Agent', 'warning')
     else:
@@ -249,6 +241,8 @@ def warning_message():
         print_text('Using Random IP', 'warning')
     else:
         print_text('IP: ' + user_ip, 'warning')
+    if args.social:
+        print_text('Using Social Engineering Mode', 'warning')
 
 def banner():
     print('''\033[1;93m
@@ -270,10 +264,11 @@ if __name__ == '__main__':
     parser.add_argument('-k', help='Not Found keyword', dest='keyword', metavar='keyword', default='None')
     parser.add_argument('-c', help='Custom Cookie', dest='cookie', metavar='cookie', default=cookie)
     parser.add_argument('-r', help='Custom Referer', dest='referer', metavar='referer', default=referer)
-    parser.add_argument('-d', help='Delay Time (second)', dest='number', metavar='second', type=int, default=0)
-    parser.add_argument('-s', help='Use Social Engineering Mode', dest='social', action='store_true')
-    parser.add_argument('-a', help='Use Random User-Agent', dest='ua', action='store_true')
-    parser.add_argument('-i', help='Use Random IP', dest='ip', action='store_true')
+    parser.add_argument('--delay', help='Delay Time (second)', dest='delay', metavar='second', type=int, default=0)
+    parser.add_argument('--timeout', help='Request Timeout (second)', dest='timeout',metavar='second', type=int, default=3)
+    parser.add_argument('--random-agent', help='Use Random User-Agent', dest='ua', action='store_true')
+    parser.add_argument('--random-ip', help='Use Random IP', dest='ip', action='store_true')
+    parser.add_argument('--social', help='Use Social Engineering Mode', dest='social', action='store_true')
     args = parser.parse_args()
     
     signal.signal(signal.SIGINT, sigquit)
@@ -307,14 +302,14 @@ if __name__ == '__main__':
     print_text('Loading dic successfully', 'info')
     time.sleep(1)
     print_text('There are %s urls will be scanned' % str(len(urls)), 'info')
-    print_text('There are %s links will be scanned' % str(queue.qsize()), 'info')
+    print_text('There are %s paths will be scanned' % str(queue.qsize()), 'info')
     print()
     warning_message()
     print()
     time.sleep(1)
 
     for i in range(args.threads):
-        t = MultiThread(queue, urls, args.method, args.keyword, args.number, headers)
+        t = MultiThread(queue, urls, args.method, args.keyword, args.delay, args.timeout, headers)
         t.start()
 
     while threading.active_count() > 1:

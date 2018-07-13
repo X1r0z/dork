@@ -5,7 +5,7 @@ dork 是一款 Web 目录爆破工具.
 ```
               ___   
  ____        __H__
-|    \ ___ ___|.|__  {1.2#stable}
+|    \ ___ ___|.|__  {1.4#stable}
 |  |  | . |  _|.|_/
 |____/|___|_| |.|_\
                V     exp10it.cn
@@ -24,12 +24,14 @@ dork 是一款 Web 目录爆破工具.
 
 延时时间 (bypass)
 
+Timeout
+
 ## usage
 
 ```
 usage: dork.py [-h] -u <URL> [-m HEAD GET POST] -f <PATH> [-t THREADS]
-               [-k keyword] [-c cookie] [-r referer] [-d second] [-s] [-a]
-               [-i]
+               [-k keyword] [-c cookie] [-r referer] [-d second]
+               [--timeout second] [--social] [--random-agent] [--random-ip]
 
 optional arguments:
   -h, --help        show this help message and exit
@@ -40,11 +42,11 @@ optional arguments:
   -k keyword        Not Found keyword
   -c cookie         Custom Cookie
   -r referer        Custom Referer
-  -d second         Delay Time (second)
-  -s                Use Social Engineering Mode
-  -a                Use Random User-Agent
-  -i                Use Random IP
-
+  --delay second    Delay Time (second)
+  --timeout second  Request Timeout (second)
+  --random-agent    Use Random User-Agent
+  --random-ip       Use Random IP
+  --social          Use Social Engineering Mode
 ```
 
 ## Example
@@ -53,8 +55,8 @@ optional arguments:
 ./dork.py -u www.test.com -f dict/DIR.txt
 ./dork.py -u url.txt -f dict/DIR.txt -t 5
 ./dork.py -u www.test.com -m GET -k '404' -f dict/DIR.txt
-./dork.py -u www.test.com -m POST -d 1 -t 1 -s -a -i -f dict/DIR.txt
-./dork.py -u www.test.com -m HEAD -c 'isLogin=1' -r 'https://www.google.com/' -f dict/DIR.txt
+./dork.py -u www.test.com -m POST -t 1 --delay 1 -random-agent -random-ip --social -f dict/DIR.txt
+./dork.py -u www.test.com -m HEAD -c 'isLogin=1' -r 'https://www.google.com/' --timeout 1 -f dict/DIR.txt
 ```
 
 ## Other
@@ -62,7 +64,7 @@ optional arguments:
 程序代码开头定义了默认的 user-agent, ip, cookie, referer, prefix, code
 
 ```
-user_agent = 'Dork v1.2#stable (https://github.com/X1r0z/dork)'
+user_agent = 'Dork v1.4#stable (https://github.com/X1r0z/dork)'
 user_ip = '127.0.0.1'
 cookie = 'hello=world'
 referer = 'https://www.baidu.com/'
