@@ -42,8 +42,8 @@ optional arguments:
   -k keyword        Not Found keyword
   -c cookie         Custom Cookie
   -r referer        Custom Referer
-  --delay second    Delay Time (second)
-  --timeout second  Request Timeout (second)
+  --delay second    Delay Time
+  --timeout second  Request Timeout
   --random-agent    Use Random User-Agent
   --random-ip       Use Random IP
   --social          Use Social Engineering Mode
@@ -55,7 +55,7 @@ optional arguments:
 ./dork.py -u www.test.com -f dict/DIR.txt
 ./dork.py -u url.txt -f dict/DIR.txt -t 5
 ./dork.py -u www.test.com -m GET -k '404' -f dict/DIR.txt
-./dork.py -u www.test.com -m POST -t 1 --delay 1 -random-agent -random-ip --social -f dict/DIR.txt
+./dork.py -u www.test.com -m POST -t 1 --delay 1 --random-agent --random-ip --social -f dict/DIR.txt
 ./dork.py -u www.test.com -m HEAD -c 'isLogin=1' -r 'https://www.google.com/' --timeout 1 -f dict/DIR.txt
 ```
 
